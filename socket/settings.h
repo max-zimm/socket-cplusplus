@@ -8,5 +8,5 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #define BUFFER_SIZE 512
-#define PORT "27015"
+#define PORT "27016"
 #define CLIENT_SERVER_IP "127.0.0.1"

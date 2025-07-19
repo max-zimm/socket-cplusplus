@@ -29,7 +29,7 @@ int Server::start(){
     hints.ai_flags = AI_PASSIVE;
 
     printf("[Server] Calling getaddrinfo...\n");
-    iResult = getaddrinfo(NULL, PORT, &hints, &result);
+    iResult = getaddrinfo(CLIENT_SERVER_IP, PORT, &hints, &result);
     if (iResult != 0) {
         printf("[Server] getaddrinfo failed: %d\n", iResult);
         WSACleanup();

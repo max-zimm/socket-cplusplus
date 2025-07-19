@@ -26,11 +26,9 @@ Client::Client(int port){
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
-    char portStr[10];
-    sprintf(portStr, "%d", port);
 
-    printf("Client: Calling getaddrinfo for %s:%s.\n", CLIENT_SERVER_IP, portStr); 
-    iResult = getaddrinfo(NULL, portStr, &hints, &result);
+
+    iResult = getaddrinfo(CLIENT_SERVER_IP, PORT, &hints, &result);
     if (iResult != 0) {
         printf("Client: getaddrinfo failed: %d\n", iResult); 
         WSACleanup();
