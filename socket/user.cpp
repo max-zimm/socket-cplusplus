@@ -1,18 +1,20 @@
-#include "client.h"
+#include "user.h"
 
-#pragma comment(lib, "Ws2_32.lib")
+Messenger::Messenger() {}
+User Messenger::CreateUser(){
 
 
+    User newUser;
 
-Client::Client(int port){
-    // Initialize Winsock.
+    // CREATE NEW USERS SOCKET
+
     int iResult;
     WSADATA wsaData;
 
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0) {
         printf("Client: WSAStartup failed: %d\n", iResult); 
-        return;
+        return newUser;
     }
 
     // Create a socket.
@@ -29,13 +31,14 @@ Client::Client(int port){
     if (iResult != 0) {
 
         WSACleanup();
-        return;
+        return newUser;
     }
 
     SOCKET connectSocket = INVALID_SOCKET;
 
+    // connect user to server
+
     for(ptr = result; ptr != NULL; ptr = ptr->ai_next ) {
-        printf("Client: Attempting to create socket.\n"); 
         connectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
         if (connectSocket == INVALID_SOCKET) {
             continue;
@@ -49,30 +52,52 @@ Client::Client(int port){
         break;
     };
 
+
     freeaddrinfo(result);
 
     if (connectSocket == INVALID_SOCKET) {
         WSACleanup();
-        return;
+        return newUser;
     }
 
+    
+    newUser.userSocket = connectSocket;
+    newUser.user_id = userCount;
+    userCount++;
+    userList.insert(userList.end(), newUser);
+    return newUser;
+}
 
-    int sendMessageRes = send(connectSocket, "Hello, Server from Client!", strlen("Hello, Server from Client!"), 0);
+void Messenger::SendMessage(User sender, char* message){
+     int sendMessageRes = send(sender.userSocket, message, strlen(message), 0);
     if (sendMessageRes == SOCKET_ERROR) {
         printf("Client: send failed: %d.\n", WSAGetLastError()); 
     }
 
-    char recvbuf[512];
-    int bytesReceived = recv(connectSocket, recvbuf, sizeof(recvbuf) - 1, 0);
+    char recvbuf[BUFFER_SIZE];
+    int bytesReceived = recv(sender.userSocket, recvbuf, sizeof(recvbuf) - 1, 0);
     if (bytesReceived > 0) {
         recvbuf[bytesReceived] = '\0';
-    } else if (bytesReceived == 0) {
-        printf("Client: Server closed connection.\n");
-    } else {
-        printf("Client: Receive failed: %d.\n", WSAGetLastError()); 
     }
-    printf("Client: Finished receiving.\n"); 
-        shutdown(connectSocket, SD_SEND);
-    closesocket(connectSocket);
-    WSACleanup();
+    shutdown(sender.userSocket, SD_SEND);
+
+}
+
+char* Messenger::GetMessage(){
+   static char messageBuffer[BUFFER_SIZE];
+
+   scanf("%s", messageBuffer);
+   return messageBuffer;
+
+   
+}
+
+int main(){
+    Messenger clients;
+
+    User newUser = clients.CreateUser();
+
+    char* message = clients.GetMessage();
+    clients.SendMessage(newUser, message);
+    return 0;
 }

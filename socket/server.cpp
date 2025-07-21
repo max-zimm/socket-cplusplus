@@ -138,7 +138,7 @@ int Server::start(){
 }
 
 int main() {
-    printf("[Main] Launching server...\n");
+    printf("Launching server...\n");
     Server myServer; 
     return 0;
 }

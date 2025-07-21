@@ -1,10 +1,10 @@
-#include "services/client.h"
-#include "services/server.h"
+#include "socket/server.h"
+#include "socket/user.h"
+
 
 
 int main(){
 
-    Server Server(315);
-    Client Client(315);
+    Server myServer();
     return 0;
 }
